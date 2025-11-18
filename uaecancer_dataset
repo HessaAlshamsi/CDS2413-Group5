@@ -1,0 +1,209 @@
+#uaecancer_dataset
+
+#Import needed libraries
+
+import pandas as pd
+dataset = pd.read_csv('uaecancer_dataset.csv')
+dataset
+
+dataset.sort_values(by='Patient_ID',ascending=True)
+
+# Display the number of rows and columns in the dataset ( rows × columns)
+dataset.shape
+
+#Display all the columns
+dataset.columns
+
+# Display summary statistics (count, mean, std, min, quartiles, max) for all numeric columns in the dataset
+dataset.describe()
+
+# dataset.head() shows the first five rows of the dataset.
+dataset.head()
+
+# Display the last 3 rows only
+dataset.tail(3)
+
+# Display number of Cancer_Type without any duplicate values
+len(dataset['Cancer_Type'].unique())
+
+
+Cleaning Data
+
+# Drop the Death_Date column
+dataset.drop('Death_Date',axis=1,inplace=True)
+print(dataset)
+
+# Drop the Cause_of_Death column
+dataset.drop('Cause_of_Death',axis=1,inplace=True)
+print(dataset)
+
+# Delete the record which are blanks
+dataset=dataset.dropna(how="all")
+dataset
+
+# Delete the record which are blanks
+dataset=dataset.dropna(how="any")
+dataset
+
+# Rename the column Comorbidities to Medical_Conditions
+dataset.rename(columns={'Comorbidities' :'Medical_Conditions'},inplace=True)
+dataset
+
+dataset2=dataset.iloc[::2]
+dataset2
+
+dataset.loc[11:20, 'Patient_ID':'Outcome']
+
+dataset[['Patient_ID', 'Outcome']]
+
+# Create a 20% sample
+sample = dataset.sample(frac=0.2, random_state=42)
+
+sample['Patient_ID'].count() 
+
+# Weight mean
+sample['Weight'].mean().round(1)
+
+# Weight median
+sample['Weight'].median()
+
+# Weight mode
+sample['Weight'].mode()
+
+# Weight standard deviation
+sample['Weight'].std()
+
+# Weight variance
+sample['Weight'].var()
+
+# Minimum Weight
+sample['Weight'].min()
+
+# Maximum Weight
+sample['Weight'].max()
+
+# find the different quantiles for the Weight
+five_num = [
+    sample["Weight"].quantile(0),    # Minimum (0th percentile)
+    sample["Weight"].quantile(0.25), # Q1 (25th percentile)
+    sample["Weight"].quantile(0.50), # Median (50th percentile)
+    sample["Weight"].quantile(0.75), # Q3 (75th percentile)
+    sample["Weight"].quantile(1)     # Maximum (100th percentile)
+]
+ 
+five_num 
+
+# find the inter quartile range(IQR) for Weight
+sample["Weight"].quantile(0.75) - sample["Weight"].quantile(0.25) 
+
+# Weight skewness
+sample['Weight'].skew()
+
+# Weight kurtosis
+sample['Weight'].kurt()
+
+# Draw the box plot for quartiles of Weight using mat plot library
+import matplotlib.pyplot as plt 
+sample.boxplot(column="Weight", 
+               return_type='axes', 
+               figsize=(8,8)) 
+
+plt.savefig('box plot for quartiles of Weight.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+sample['Cancer_Type'].value_counts().plot(kind='pie', title='Cancer_Type')
+plt.savefig('Cancer_Type.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#Distribution plot using histplot with KDE
+plt.figure(figsize=(8, 6))
+sns.histplot(data=sample, x='Age', kde=True)
+plt.title('Age Distribution')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+
+plt.tight_layout()
+plt.savefig('#histplot with KDE.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Create a single scatter plot
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='Age', y='Weight', data=sample)
+plt.title('Age vs. Weight')
+plt.xlabel('Age')
+plt.ylabel('Weight')
+
+plt.tight_layout()
+plt.savefig('Age_vs_Weight_Scatter.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Create a single boxplot
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Outcome', y='Age', data=sample)
+plt.title('Age by Outcome Status')
+plt.xlabel('Outcome')
+plt.ylabel('Age')
+
+plt.tight_layout()
+plt.savefig('Age_by_Outcome_Boxplot.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv("uaecancer_dataset.csv")
+
+# Take 20% sample
+sample_df = df.sample(frac=0.2, random_state=42)
+
+# Select only numeric columns (exclude Patient IDs, text, etc.)
+numeric_df = sample_df.select_dtypes(include=['float64', 'int64'])
+
+# Generate correlation heatmap
+plt.figure(figsize=(8,6))
+sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Correlation Heatmap (20% Sample)")
+plt.savefig('Correlation Heatmap (20% Sample).png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+sns.countplot(x='Cancer_Type', data=sample)
+plt.title("Cancer Type Distribution (20% Sample)")
+plt.xlabel("Cancer Type")
+plt.ylabel("Count")
+plt.xticks(rotation=45)  
+plt.show()
+
+X = dataset.iloc[:, [12]].values
+y = dataset.iloc[:,8].values
+print(X)
+print(y)
+
+from sklearn.preprocessing import LabelEncoder
+
+
+# Initialize LabelEncoder
+le = LabelEncoder()
+
+# Fit and transform the 'Outcome' column
+dataset['Outcome_encoded'] = le.fit_transform(dataset['Outcome'])
+
+# Display the mapping and encoded values
+print("Classes:", le.classes_)
+print(dataset['Outcome_encoded'])
